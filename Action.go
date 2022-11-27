@@ -1,4 +1,4 @@
-package NGo
+package ngo
 
 type Action func()
 
