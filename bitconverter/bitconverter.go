@@ -52,6 +52,9 @@ func (b *BitConverter) GetBytesFromUInt32(value uint32) ([]byte, error) {
 func (b *BitConverter) GetBytesFromUInt64(value uint64) ([]byte, error) {
 	return b.toBytes(value)
 }
+func (b *BitConverter) GetBytesFromDouble(value float64) ([]byte, error) {
+	return b.toBytes(value)
+}
 func (b *BitConverter) ToBoolean(value []byte, startIndex int) (bool, error) {
 	var result bool
 	err := b.getValue(value[startIndex:], &result)
