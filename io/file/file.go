@@ -11,6 +11,8 @@ import (
 
 //refrence:https://learn.microsoft.com/en-us/dotnet/api/system.io?view=netframework-4.7.2
 
+const nextLine string = "\r\n"
+
 func readFile(path string) ([]byte, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -68,10 +70,45 @@ func copyFileWithFlag(srcFile, dstFile string, flag int) error {
 		}
 		dstWriter.Write(tempBuf[:n])
 	}
+	if err := dstWriter.Flush(); err != nil {
+		return err
+	}
 	return nil
 }
+
+func writeFile(path string, contents []byte) error {
+	f, err := os.OpenFile(path, os.O_TRUNC|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	buf := bufio.NewWriter(f)
+	if _, err := buf.Write(contents); err != nil {
+		return err
+	}
+	if err := buf.Flush(); err != nil { //保存
+		return err
+	}
+	return nil
+}
+func appendFile(path string, contents []byte) error {
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	buf := bufio.NewWriter(f)
+	if _, err := buf.Write(contents); err != nil {
+		return err
+	}
+	if err := buf.Flush(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func Copy(srcFile string, dstFile string) error {
-	return copyFileWithFlag(srcFile, dstFile, os.O_EXCL)
+	return copyFileWithFlag(srcFile, dstFile, os.O_EXCL|os.O_CREATE)
 }
 
 func CopyWithOverwrite(srcFile string, dstFile string) error {
@@ -113,67 +150,23 @@ func ReadAllText(path string) (string, error) {
 	}
 	return string(contents), nil
 }
-func AppendAllLines(path string, strs []string) error {
-	f, err := os.OpenFile(path, os.O_APPEND, os.ModePerm) //just read
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	buf := bufio.NewWriter(f)
-	for _, str := range strs {
-		if _, err := buf.WriteString(str + "\r\n"); err != nil {
-			return err
-		}
-	}
-	return nil
+func AppendAllLines(path string, contents []string) error {
+	str := strings.Join(contents, nextLine)
+	str = str + nextLine
+	return appendFile(path, []byte(str))
 }
-func AppedAllText(path string, str string) error {
-	f, err := os.OpenFile(path, os.O_APPEND, os.ModePerm) //just read
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	buf := bufio.NewWriter(f)
-	if _, err := buf.WriteString(str); err != nil {
-		return err
-	}
-	return nil
+func AppendAllText(path string, str string) error {
+	return appendFile(path, []byte(str))
 }
 func WriteAllBytes(path string, bytes []byte) error {
-	f, err := os.OpenFile(path, os.O_WRONLY, os.ModePerm) //just read
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	buf := bufio.NewWriter(f)
-	if _, err := buf.Write(bytes); err != nil {
-		return err
-	}
-	return nil
+	return writeFile(path, bytes)
 }
 func WriteAllLines(path string, contents []string) error {
-	f, err := os.OpenFile(path, os.O_WRONLY, os.ModePerm) //just read
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	buf := bufio.NewWriter(f)
-	for _, str := range contents {
-		if _, err := buf.WriteString(str + "\r\n"); err != nil {
-			return err
-		}
-	}
-	return nil
+	str := strings.Join(contents, nextLine)
+	str = str + nextLine
+	return writeFile(path, []byte(str))
 }
+
 func WriteAllText(path string, content string) error {
-	f, err := os.OpenFile(path, os.O_WRONLY, os.ModePerm) //just read
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	buf := bufio.NewWriter(f)
-	if _, err := buf.WriteString(content); err != nil {
-		return err
-	}
-	return nil
+	return writeFile(path, []byte(content))
 }
