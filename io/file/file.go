@@ -14,27 +14,7 @@ import (
 const nextLine string = "\r\n"
 
 func readFile(path string) ([]byte, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	reader := bufio.NewReader(f)
-	result := make([]byte, 0, 1024)
-	for {
-		buffer := make([]byte, 0, 1024)
-		n, err := reader.Read(buffer)
-		if err != nil {
-			if err == io.EOF {
-				result = append(result, buffer[:n]...)
-				break
-			} else {
-				return nil, err
-			}
-		}
-		result = append(result, buffer[:n]...)
-	}
-	return result, nil
+	return os.ReadFile(path)
 }
 
 func copyFileWithFlag(srcFile, dstFile string, flag int) error {
@@ -141,7 +121,8 @@ func ReadAllLines(path string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return strings.Split(string(contents), "\n"), nil
+	newContents := strings.TrimSuffix(string(contents), nextLine)
+	return strings.Split(newContents, nextLine), nil
 }
 func ReadAllText(path string) (string, error) {
 	contents, err := readFile(path)

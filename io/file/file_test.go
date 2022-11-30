@@ -1,8 +1,10 @@
 package file
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -136,4 +138,44 @@ func TestMoveWithOverwrite(t *testing.T) {
 		return
 	}
 	t.Log("test finish")
+}
+func TestReadAllBytes(t *testing.T) {
+	path := "./xxx.txt"
+	data := []byte{1, 2, 3, 4}
+	err := WriteAllBytes(path, data)
+	t.Log("write finish")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	dataNew, err := ReadAllBytes(path)
+	t.Log("read finish")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if !bytes.Equal(dataNew, dataNew) {
+		t.Errorf("new bytes :%v not equals to old bytes:%v", dataNew, data)
+		return
+	}
+}
+func TestReadAllLines(t *testing.T) {
+	path := "./xxx.txt"
+	data := []string{"1", "2", "3", "4"}
+	err := WriteAllLines(path, data)
+	t.Log("write finish")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	dataNew, err := ReadAllLines(path)
+	t.Log("read finish")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if !reflect.DeepEqual(data, dataNew) {
+		t.Errorf("new bytes :%v not equals to old bytes:%v", dataNew, data)
+		return
+	}
 }
