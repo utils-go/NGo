@@ -6,11 +6,14 @@ import (
 )
 
 type DateTime struct {
-	t *time.Time
+	t time.Time
 }
 
+func Now() *DateTime {
+	return &DateTime{t: time.Now()}
+}
 func NewDateTime(t time.Time) *DateTime {
-	return &DateTime{t: &t}
+	return &DateTime{t: t}
 }
 
 func (t *DateTime) ToString(cslayout string) string {
@@ -69,9 +72,9 @@ func (t *DateTime) ToString(cslayout string) string {
 }
 
 func (t *DateTime) ToTime() *time.Time {
-	return t.t
+	return &t.t
 }
-func (t *DateTime) Add() {
+func (t *DateTime) Add(dateTime DateTime) {
 
 }
 func (t *DateTime) String() string {
