@@ -6,12 +6,10 @@ this is based on .net4.7.2 api
 refrence:https://learn.microsoft.com/en-us/dotnet/api/?view=netframework-4.7.2&preserve-view=true
 
 # Usage
-- import ngo
  ```
  go get -u github.com/lishuangquan1987/ngo
  ```
-- use ngo
-file:
+file: same as `Sytem.IO.File`
 ```go
 package main
 
@@ -32,7 +30,7 @@ func main() {
 }
 
 ```
-bitconverter:
+bitconverter: same as `System.BitConverter`,but it is not static methods,so you can change `LittleEndian` or `BigEndian` any where
 ```go
 package main
 
