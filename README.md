@@ -1,11 +1,13 @@
 # NGo
-the .net api implement by go.you can write go as like .net
+`ngo` means .net api implement by go
+
+the .net api implement by go. you can write go as like .net
 
 this is based on .net4.7.2 api
 
-api refrence:https://learn.microsoft.com/en-us/dotnet/api/?view=netframework-4.7.2&preserve-view=true
+api reference:https://learn.microsoft.com/en-us/dotnet/api/?view=netframework-4.7.2&preserve-view=true
 
-source code refrence:https://referencesource.microsoft.com/
+source code reference:https://referencesource.microsoft.com/
 # Usage
  ```
  go get -u github.com/lishuangquan1987/ngo
@@ -66,7 +68,7 @@ func main() {
 - BitConverter
 
 # InProgress:
-- Diretory+
+- Diretory
 - DateTime
 - TimeSpan
 - ...

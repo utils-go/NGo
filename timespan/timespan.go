@@ -73,6 +73,18 @@ func (t *TimeSpan) TotalSeconds() int {
 func (t *TimeSpan) Add(ts TimeSpan) *TimeSpan {
 
 }
+func (t *TimeSpan) Duration() *TimeSpan {
+
+}
+func (t *TimeSpan) Equals() {
+
+}
+func (t *TimeSpan) Subtract() *TimeSpan {
+
+}
+func (t *TimeSpan) ToString() string {
+
+}
 
 type TimeSpanBuilder struct {
 	day         int64
@@ -109,4 +121,33 @@ func (t *TimeSpanBuilder) Build() (*TimeSpan, error) {
 	}
 	ticks := totalMilliSeconds * TicksPerMillisecond
 	return &TimeSpan{ticks: ticks}, nil
+}
+
+// static method
+func Compare(t1, t2 *TimeSpan) int {
+
+}
+func FromDays(value float64) *TimeSpan {
+
+}
+func FromHours(value float64) *TimeSpan {
+
+}
+func FromMilliseconds(value float64) *TimeSpan {
+
+}
+func FromMinutes(value float64) *TimeSpan {
+
+}
+func FromSeconds(value float64) *TimeSpan {
+
+}
+func FromTicks(value float64) *TimeSpan {
+
+}
+func Parse(s string) (*TimeSpan, error) {
+
+}
+func ParseExact(s string, cslayout string) (*TimeSpan, error) {
+
 }
