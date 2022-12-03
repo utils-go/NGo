@@ -37,6 +37,43 @@ func NewTimeSpanFromTicks(ticks int64) *TimeSpan {
 	return &TimeSpan{ticks: ticks}
 }
 
+func (t *TimeSpan) Days() int {
+
+}
+func (t *TimeSpan) Hours() int {
+
+}
+func (t *TimeSpan) Milliseconds() {
+
+}
+func (t *TimeSpan) Minutes() int {
+
+}
+func (t *TimeSpan) Seconds() int {
+
+}
+func (t *TimeSpan) Ticks() {
+
+}
+func (t *TimeSpan) TotalDays() {
+
+}
+func (t *TimeSpan) TotalHours() int {
+
+}
+func (t *TimeSpan) TotalMiniseconds() int {
+
+}
+func (t *TimeSpan) TotalMinutes() int {
+
+}
+func (t *TimeSpan) TotalSeconds() int {
+
+}
+func (t *TimeSpan) Add(ts TimeSpan) *TimeSpan {
+
+}
+
 type TimeSpanBuilder struct {
 	day         int64
 	hour        int64
