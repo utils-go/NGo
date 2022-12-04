@@ -38,52 +38,56 @@ func NewTimeSpanFromTicks(ticks int64) *TimeSpan {
 }
 
 func (t *TimeSpan) Days() int {
-
+	return int(t.ticks / TicksPerDay)
 }
 func (t *TimeSpan) Hours() int {
-
+	return int(t.ticks / TicksPerHour)
 }
-func (t *TimeSpan) Milliseconds() {
-
+func (t *TimeSpan) Milliseconds() int {
+	return int(t.ticks / TicksPerMillisecond)
 }
 func (t *TimeSpan) Minutes() int {
-
+	return int(t.ticks / TicksPerMinute)
 }
 func (t *TimeSpan) Seconds() int {
-
+	return int(t.ticks / TicksPerSecond)
 }
-func (t *TimeSpan) Ticks() {
-
+func (t *TimeSpan) Ticks() int {
+	return int(t.ticks)
 }
-func (t *TimeSpan) TotalDays() {
-
+func (t *TimeSpan) TotalDays() float64 {
+	return float64(t.ticks) * DaysPerTick
 }
-func (t *TimeSpan) TotalHours() int {
-
+func (t *TimeSpan) TotalHours() float64 {
+	return float64(t.ticks) * HoursPerTick
 }
-func (t *TimeSpan) TotalMiniseconds() int {
-
+func (t *TimeSpan) TotalMilliseconds() float64 {
+	return float64(t.ticks) * MillisecondsPerTick
 }
-func (t *TimeSpan) TotalMinutes() int {
-
+func (t *TimeSpan) TotalMinutes() float64 {
+	return float64(t.ticks) * MillisecondsPerTick
 }
-func (t *TimeSpan) TotalSeconds() int {
-
+func (t *TimeSpan) TotalSeconds() float64 {
+	return float64(t.ticks) * SecondsPerTick
 }
 func (t *TimeSpan) Add(ts TimeSpan) *TimeSpan {
-
+	totalTicks := t.ticks + ts.ticks
+	return &TimeSpan{ticks: totalTicks}
 }
 func (t *TimeSpan) Duration() *TimeSpan {
+	if t.ticks > 0 {
+		return &TimeSpan{ticks: t.ticks}
+	} else {
+		return &TimeSpan{ticks: -t.ticks}
+	}
 
 }
-func (t *TimeSpan) Equals() {
-
+func (t *TimeSpan) Equals(ts TimeSpan) bool {
+	return t.ticks == ts.ticks
 }
-func (t *TimeSpan) Subtract() *TimeSpan {
-
-}
-func (t *TimeSpan) ToString() string {
-
+func (t *TimeSpan) Subtract(ts TimeSpan) *TimeSpan {
+	totalTicks := t.ticks - ts.ticks
+	return &TimeSpan{ticks: totalTicks}
 }
 
 type TimeSpanBuilder struct {
@@ -125,29 +129,48 @@ func (t *TimeSpanBuilder) Build() (*TimeSpan, error) {
 
 // static method
 func Compare(t1, t2 *TimeSpan) int {
-
+	if t1.ticks > t2.ticks {
+		return 1
+	}
+	if t1.ticks < t2.ticks {
+		return -1
+	}
+	return 0
 }
 func FromDays(value float64) *TimeSpan {
-
+	return interval(value, MillisPerDay)
 }
 func FromHours(value float64) *TimeSpan {
-
+	return interval(value, MillisPerHour)
 }
 func FromMilliseconds(value float64) *TimeSpan {
-
+	return interval(value, 1)
 }
 func FromMinutes(value float64) *TimeSpan {
-
+	return interval(value, MillisPerMinute)
 }
 func FromSeconds(value float64) *TimeSpan {
-
+	return interval(value, MillisPerSecond)
 }
-func FromTicks(value float64) *TimeSpan {
-
+func FromTicks(value int64) *TimeSpan {
+	return &TimeSpan{ticks: value}
 }
 func Parse(s string) (*TimeSpan, error) {
-
+	//TODO
+	return nil, nil
 }
 func ParseExact(s string, cslayout string) (*TimeSpan, error) {
+	//TODO
+	return nil, nil
+}
+func interval(value float64, scale int) *TimeSpan {
+	tmp := value * float64(scale)
+	var millis float64
+	if value > 0 {
+		millis = tmp + 0.5
+	} else {
+		millis = tmp - 0.5
+	}
 
+	return &TimeSpan{ticks: int64(millis) * TicksPerMillisecond}
 }
