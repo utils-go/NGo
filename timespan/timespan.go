@@ -2,6 +2,7 @@ package timespan
 
 import (
 	"fmt"
+	"time"
 )
 
 const (
@@ -157,12 +158,13 @@ func FromTicks(value int64) *TimeSpan {
 }
 func Parse(s string) (*TimeSpan, error) {
 	//TODO
-	return nil, nil
+	duration, err := time.ParseDuration(s)
+	if err != nil {
+		return nil, err
+	}
+	return &TimeSpan{ticks: duration.Nanoseconds()}, nil
 }
-func ParseExact(s string, cslayout string) (*TimeSpan, error) {
-	//TODO
-	return nil, nil
-}
+
 func interval(value float64, scale int) *TimeSpan {
 	tmp := value * float64(scale)
 	var millis float64
