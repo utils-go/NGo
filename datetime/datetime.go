@@ -66,70 +66,72 @@ func (t *DateTime) Date() *DateTime {
 	year, month, day := t.t.Date()
 	return &DateTime{t: time.Date(year, month, day, 0, 0, 0, 0, time.Local)}
 }
-func (t *DateTime) getDatePart(part int) int {
-	internalTick := t.t.UnixNano() & 0x3FFFFFFFFFFFFFFF
-	ticks := internalTick
-	// n = number of days since 1/1/0001
-	n := int(ticks / timespan.TicksPerDay)
-	// y400 = number of whole 400-year periods since 1/1/0001
-	y400 := n / daysPer400Years
-	// n = day number within 400-year period
-	n -= y400 * daysPer400Years
-	// y100 = number of whole 100-year periods within 400-year period
-	y100 := n / daysPer100Years
-	// Last 100-year period has an extra day, so decrement result if 4
-	if y100 == 4 {
-		y100 = 3
-	}
-	// n = day number within 100-year period
-	n -= y100 * daysPer100Years
-	// y4 = number of whole 4-year periods within 100-year period
-	y4 := n / daysPer4Years
-	// n = day number within 4-year period
-	n -= y4 * daysPer4Years
-	// y1 = number of whole years within 4-year period
-	y1 := n / daysPerYear
-	// Last year has an extra day, so decrement result if 4
-	if y1 == 4 {
-		y1 = 3
-	}
-	// If year was requested, compute and return it
-	if part == 0 {
-		return y400*400 + y100*100 + y4*4 + y1 + 1
-	}
-	// n = day number within year
-	n -= y1 * daysPerYear
-	// If day-of-year was requested, return it
-	if part == 1 {
-		return n + 1
-	}
-	// Leap year calculation looks different from IsLeapYear since y1, y4,
-	// and y100 are relative to year 1, not year 0
-	leapYear := y1 == 3 && (y4 != 24 || y100 == 3)
-	days := make([]int, 0)
-	if leapYear {
-		days = timespan.DaysToMonth366
-	} else {
-		days = timespan.DaysToMonth365
-	}
-	// All months have less than 32 days, so n >> 5 is a good conservative
-	// estimate for the month
-	m := n>>5 + 1
-	// m = 1-based month number
-	for {
-		if n >= days[m] {
-			m++
-		} else {
-			break
-		}
-	}
-	// If month was requested, return it
-	if part == 2 {
-		return m
-	}
-	// Return 1-based day-of-month
-	return n - days[m-1] + 1
-}
+
+//func (t *DateTime) getDatePart(part int) int {
+//	internalTick := t.t.UnixNano() & 0x3FFFFFFFFFFFFFFF
+//	ticks := internalTick
+//	// n = number of days since 1/1/0001
+//	n := int(ticks / timespan.TicksPerDay)
+//	// y400 = number of whole 400-year periods since 1/1/0001
+//	y400 := n / daysPer400Years
+//	// n = day number within 400-year period
+//	n -= y400 * daysPer400Years
+//	// y100 = number of whole 100-year periods within 400-year period
+//	y100 := n / daysPer100Years
+//	// Last 100-year period has an extra day, so decrement result if 4
+//	if y100 == 4 {
+//		y100 = 3
+//	}
+//	// n = day number within 100-year period
+//	n -= y100 * daysPer100Years
+//	// y4 = number of whole 4-year periods within 100-year period
+//	y4 := n / daysPer4Years
+//	// n = day number within 4-year period
+//	n -= y4 * daysPer4Years
+//	// y1 = number of whole years within 4-year period
+//	y1 := n / daysPerYear
+//	// Last year has an extra day, so decrement result if 4
+//	if y1 == 4 {
+//		y1 = 3
+//	}
+//	// If year was requested, compute and return it
+//	if part == 0 {
+//		return y400*400 + y100*100 + y4*4 + y1 + 1
+//	}
+//	// n = day number within year
+//	n -= y1 * daysPerYear
+//	// If day-of-year was requested, return it
+//	if part == 1 {
+//		return n + 1
+//	}
+//	// Leap year calculation looks different from IsLeapYear since y1, y4,
+//	// and y100 are relative to year 1, not year 0
+//	leapYear := y1 == 3 && (y4 != 24 || y100 == 3)
+//	days := make([]int, 0)
+//	if leapYear {
+//		days = timespan.DaysToMonth366
+//	} else {
+//		days = timespan.DaysToMonth365
+//	}
+//	// All months have less than 32 days, so n >> 5 is a good conservative
+//	// estimate for the month
+//	m := n>>5 + 1
+//	// m = 1-based month number
+//	for {
+//		if n >= days[m] {
+//			m++
+//		} else {
+//			break
+//		}
+//	}
+//	// If month was requested, return it
+//	if part == 2 {
+//		return m
+//	}
+//	// Return 1-based day-of-month
+//	return n - days[m-1] + 1
+//}
+
 func (t *DateTime) Day() int {
 	return t.t.Day()
 }
@@ -141,4 +143,10 @@ func (t *DateTime) Year() int {
 }
 func (t *DateTime) DayOfWeek() time.Weekday {
 	return t.t.Weekday()
+}
+func (t *DateTime) DayOfYear() int {
+	return t.t.YearDay()
+}
+func (t *DateTime) Hour() int {
+	return t.t.Hour()
 }
