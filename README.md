@@ -66,9 +66,10 @@ func main() {
 - File
 - Path
 - BitConverter
-
-# InProgress:
 - Diretory
 - DateTime
 - TimeSpan
+- Console
+
+# InProgress:
 - ...
