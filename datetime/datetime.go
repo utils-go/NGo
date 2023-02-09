@@ -1,8 +1,8 @@
 package datetime
 
 import (
-	"github.com/lishuangquan1987/ngo/timespan"
-	"github.com/lishuangquan1987/ngo/utils"
+	"github.com/utils-go/ngo/timespan"
+	"github.com/utils-go/ngo/utils"
 	"time"
 )
 
