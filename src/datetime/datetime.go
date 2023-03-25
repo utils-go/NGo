@@ -44,8 +44,11 @@ func NewDateTime(t time.Time) *DateTime {
 }
 
 func (t *DateTime) ToString(cslayout string) string {
-	cslayout = utils.ConvertLayout(cslayout)
-	return t.t.Format(cslayout)
+	golayout, err := utils.ConvertLayout(cslayout)
+	if err != nil {
+		golayout = "2006-05-04 15:02:01"
+	}
+	return t.t.Format(golayout)
 }
 
 func (t *DateTime) ToTime() *time.Time {

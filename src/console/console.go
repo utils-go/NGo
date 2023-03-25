@@ -10,6 +10,9 @@ func Write(a ...any) {
 }
 func ReadLine() string {
 	var str string
-	fmt.Scan(&str)
-	return str
+	_, err := fmt.Scanln(&str)
+	if err != nil {
+		return str
+	}
+	return ""
 }
