@@ -15,12 +15,12 @@ type ReconnectTcp struct {
 	//通知关闭，结束协程，不进行断线重连
 	closeChan chan struct{}
 	// 将返回的内容放入这里
-	RecvBuffer concurrent.ConcurrentListT[byte]
+	RecvBuffer *concurrent.ConcurrentListT[byte]
 	// tcp连接
 	conn net.Conn
 }
 
-func (t *ReconnectTcp) SendMsg(data []byte, timeout int) error {
+func (t *ReconnectTcp) SendMsg(data []byte) error {
 	if t.conn == nil {
 		t.reconnectChan <- struct{}{}
 		time.Sleep(time.Millisecond * 100)
@@ -38,16 +38,19 @@ func (t *ReconnectTcp) SendMsg(data []byte, timeout int) error {
 }
 
 // new reconnect tcp connection
-func NewRTcpConnection(addr string) *ReconnectTcp {
+func NewRTcpConnection(addr string) (*ReconnectTcp, error) {
+	if _, err := net.ResolveTCPAddr("tcp", addr); err != nil {
+		return nil, err
+	}
 	t := &ReconnectTcp{
 		DstAddr:       addr,
 		reconnectChan: make(chan struct{}, 100),
 		closeChan:     make(chan struct{}, 100),
-		RecvBuffer:    concurrent.ConcurrentListT[byte]{},
+		RecvBuffer:    concurrent.NewListT[byte](),
 	}
 	go t.handleReconnect()
 	go t.handleRead()
-	return t
+	return t, nil
 }
 func (t *ReconnectTcp) connect() {
 	if t.conn != nil {
@@ -78,8 +81,6 @@ func (t *ReconnectTcp) handleReconnect() {
 
 // 连接
 func (t *ReconnectTcp) handleRead() {
-	//wait for connect
-	time.Sleep(time.Second)
 	buf := make([]byte, 1024*10)
 	for {
 		//处理关闭
@@ -91,7 +92,7 @@ func (t *ReconnectTcp) handleRead() {
 		}
 		if t.conn == nil {
 			t.reconnectChan <- struct{}{}
-			time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Millisecond * 200)
 			continue
 		}
 		n, err := t.conn.Read(buf)
@@ -99,6 +100,7 @@ func (t *ReconnectTcp) handleRead() {
 			t.RecvBuffer.AddRange(buf[:n])
 		} else {
 			t.reconnectChan <- struct{}{}
+			time.Sleep(time.Millisecond * 200)
 		}
 	}
 }
