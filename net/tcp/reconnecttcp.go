@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/utils-go/ngo/collections/concurrent"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -18,19 +19,22 @@ type ReconnectTcp struct {
 	RecvBuffer *concurrent.ConcurrentListT[byte]
 	// tcp连接
 	conn net.Conn
+	mu   sync.Mutex
 }
 
 func (t *ReconnectTcp) SendMsg(data []byte) error {
 	if t.conn == nil {
-		t.reconnectChan <- struct{}{}
-		time.Sleep(time.Millisecond * 100)
+		t.reconnect()
 		return fmt.Errorf("%s not connect yet", t.DstAddr)
 	}
 
+	t.mu.Lock()
 	_, err := t.conn.Write(data)
+	t.mu.Unlock()
+
 	if err != nil {
 		//出错，重连
-		t.reconnectChan <- struct{}{}
+		t.reconnect()
 		time.Sleep(time.Millisecond * 100)
 		return err
 	}
@@ -44,8 +48,8 @@ func NewRTcpConnection(addr string) (*ReconnectTcp, error) {
 	}
 	t := &ReconnectTcp{
 		DstAddr:       addr,
-		reconnectChan: make(chan struct{}, 100),
-		closeChan:     make(chan struct{}, 100),
+		reconnectChan: make(chan struct{}),
+		closeChan:     make(chan struct{}),
 		RecvBuffer:    concurrent.NewListT[byte](),
 	}
 	go t.handleReconnect()
@@ -70,12 +74,18 @@ func (t *ReconnectTcp) handleReconnect() {
 		select {
 		case <-t.reconnectChan:
 			t.connect()
-			//重连之后，清除掉t.reconnectChan中的内容
-			t.reconnectChan = make(chan struct{}, 100)
 		case <-t.closeChan:
 			fmt.Printf("remote connection:%s has been closed,exit reconnect goroutine\n", t.DstAddr)
 			return
 		}
+	}
+}
+
+// add signal without block
+func (t *ReconnectTcp) reconnect() {
+	select {
+	case t.reconnectChan <- struct{}{}:
+	default:
 	}
 }
 
@@ -91,7 +101,7 @@ func (t *ReconnectTcp) handleRead() {
 		default:
 		}
 		if t.conn == nil {
-			t.reconnectChan <- struct{}{}
+			t.reconnect()
 			time.Sleep(time.Millisecond * 200)
 			continue
 		}
@@ -99,7 +109,7 @@ func (t *ReconnectTcp) handleRead() {
 		if err == nil {
 			t.RecvBuffer.AddRange(buf[:n])
 		} else {
-			t.reconnectChan <- struct{}{}
+			t.reconnect()
 			time.Sleep(time.Millisecond * 200)
 		}
 	}
@@ -107,6 +117,5 @@ func (t *ReconnectTcp) handleRead() {
 
 // 关闭
 func (t *ReconnectTcp) Close() {
-	t.closeChan <- struct{}{} //notify reconnect goroutine close
-	t.closeChan <- struct{}{} //notify handleRead goroutine close
+	close(t.closeChan)
 }

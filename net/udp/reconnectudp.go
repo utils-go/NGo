@@ -26,17 +26,18 @@ type ReconnectUdp struct {
 }
 
 func (u *ReconnectUdp) SendMsg(data []byte) error {
-	u.mu.Lock()
-	defer u.mu.Unlock()
-
 	if u.conn == nil {
-		u.reconnectChan <- struct{}{}
+		u.reconnect()
 		time.Sleep(time.Millisecond * 100)
 		return fmt.Errorf("%s not connect yet", u.DstAddr)
 	}
+
+	u.mu.Lock()
 	_, err := u.conn.WriteToUDP(data, u.DstAddr)
+	u.mu.Unlock()
+
 	if err != nil {
-		u.reconnectChan <- struct{}{}
+		u.reconnect()
 		time.Sleep(time.Millisecond * 100)
 		return err
 	}
@@ -49,7 +50,8 @@ func NewRUdpConnection(serverAddr string) (*ReconnectUdp, error) {
 	}
 	u := &ReconnectUdp{
 		DstAddr:       udpAddr,
-		reconnectChan: make(chan struct{}, 100),
+		reconnectChan: make(chan struct{}),
+		closeChan:     make(chan struct{}),
 		RecvBuffer:    concurrent.NewListT[byte](),
 	}
 	go u.handleReconnect()
@@ -74,12 +76,18 @@ func (u *ReconnectUdp) handleReconnect() {
 		select {
 		case <-u.reconnectChan:
 			u.connect()
-			//清除t.reconnectChan中的内容
-			u.reconnectChan = make(chan struct{}, 100)
 		case <-u.closeChan:
 			fmt.Printf("remote connection:%s has been closed,exit reconnect goroutine\n", u.DstAddr)
 			return
 		}
+	}
+}
+
+// add signal without block
+func (t *ReconnectUdp) reconnect() {
+	select {
+	case t.reconnectChan <- struct{}{}:
+	default:
 	}
 }
 
@@ -94,7 +102,7 @@ func (u *ReconnectUdp) handRead() {
 		default:
 		}
 		if u.conn == nil {
-			u.reconnectChan <- struct{}{}
+			u.reconnect()
 			time.Sleep(time.Millisecond * 200)
 			continue
 		}
@@ -107,8 +115,11 @@ func (u *ReconnectUdp) handRead() {
 				fmt.Printf("recv from [%s] but listen on [%s]\n", addr.String(), u.DstAddr.String())
 			}
 		} else {
-			u.reconnectChan <- struct{}{}
+			u.reconnect()
 			time.Sleep(time.Millisecond * 200)
 		}
 	}
+}
+func (u *ReconnectUdp) Close() {
+	close(u.closeChan)
 }
