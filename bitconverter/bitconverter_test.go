@@ -7,7 +7,7 @@ import (
 func TestByteConverterInt16(t *testing.T) {
 	converter := BitConverter{}
 	value := int16(-12)
-	v, err := converter.GetBytesFromInt16(value)
+	v, err := converter.GetBytesFromInt16E(value)
 	if err != nil {
 		t.Error(err)
 	}
@@ -15,7 +15,7 @@ func TestByteConverterInt16(t *testing.T) {
 	for _, b := range v {
 		t.Log(b)
 	}
-	value1, err := converter.ToInt16(v, 0)
+	value1, err := converter.ToInt16E(v, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -26,7 +26,7 @@ func TestByteConverterInt16(t *testing.T) {
 func TestByteConverterInt32(t *testing.T) {
 	converter := BitConverter{}
 	value := int32(-1211215)
-	v, err := converter.GetBytesFromInt32(value)
+	v, err := converter.GetBytesFromInt32E(value)
 	if err != nil {
 		t.Error(err)
 	}
@@ -34,7 +34,7 @@ func TestByteConverterInt32(t *testing.T) {
 	for _, b := range v {
 		t.Log(b)
 	}
-	value1, err := converter.ToInt32(v, 0)
+	value1, err := converter.ToInt32E(v, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -45,7 +45,7 @@ func TestByteConverterInt32(t *testing.T) {
 func TestByteConverterInt64(t *testing.T) {
 	converter := BitConverter{}
 	value := int64(-1121212121212121212)
-	v, err := converter.GetBytesFromInt64(value)
+	v, err := converter.GetBytesFromInt64E(value)
 	if err != nil {
 		t.Error(err)
 	}
@@ -53,7 +53,7 @@ func TestByteConverterInt64(t *testing.T) {
 	for _, b := range v {
 		t.Log(b)
 	}
-	value1, err := converter.ToInt64(v, 0)
+	value1, err := converter.ToInt64E(v, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -65,7 +65,7 @@ func TestByteConverterInt64(t *testing.T) {
 func TestByteConverterUInt16(t *testing.T) {
 	converter := BitConverter{}
 	value := uint16(12)
-	v, err := converter.GetBytesFromUInt16(value)
+	v, err := converter.GetBytesFromUInt16E(value)
 	if err != nil {
 		t.Error(err)
 	}
@@ -73,7 +73,7 @@ func TestByteConverterUInt16(t *testing.T) {
 	for _, b := range v {
 		t.Log(b)
 	}
-	value1, err := converter.ToUInt16(v, 0)
+	value1, err := converter.ToUInt16E(v, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -84,7 +84,7 @@ func TestByteConverterUInt16(t *testing.T) {
 func TestByteConverterUInt32(t *testing.T) {
 	converter := BitConverter{}
 	value := uint32(1211215)
-	v, err := converter.GetBytesFromUInt32(value)
+	v, err := converter.GetBytesFromUInt32E(value)
 	if err != nil {
 		t.Error(err)
 	}
@@ -92,7 +92,7 @@ func TestByteConverterUInt32(t *testing.T) {
 	for _, b := range v {
 		t.Log(b)
 	}
-	value1, err := converter.ToUInt32(v, 0)
+	value1, err := converter.ToUInt32E(v, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -103,7 +103,7 @@ func TestByteConverterUInt32(t *testing.T) {
 func TestByteConverterUInt64(t *testing.T) {
 	converter := BitConverter{}
 	value := uint64(1121212121212121212)
-	v, err := converter.GetBytesFromUInt64(value)
+	v, err := converter.GetBytesFromUInt64E(value)
 	if err != nil {
 		t.Error(err)
 	}
@@ -111,7 +111,7 @@ func TestByteConverterUInt64(t *testing.T) {
 	for _, b := range v {
 		t.Log(b)
 	}
-	value1, err := converter.ToUInt64(v, 0)
+	value1, err := converter.ToUInt64E(v, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -122,7 +122,7 @@ func TestByteConverterUInt64(t *testing.T) {
 func TestByteConverterBool(t *testing.T) {
 	converter := BitConverter{}
 	value := true
-	v, err := converter.GetBytesFromBool(value)
+	v, err := converter.GetBytesFromBoolE(value)
 	if err != nil {
 		t.Error(err)
 	}
@@ -130,7 +130,7 @@ func TestByteConverterBool(t *testing.T) {
 	for _, b := range v {
 		t.Log(b)
 	}
-	value1, err := converter.ToBoolean(v, 0)
+	value1, err := converter.ToBooleanE(v, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -141,7 +141,7 @@ func TestByteConverterBool(t *testing.T) {
 func TestByteConverterDouble(t *testing.T) {
 	converter := BitConverter{}
 	value := float64(2.336554)
-	v, err := converter.GetBytesFromDouble(value)
+	v, err := converter.GetBytesFromDoubleE(value)
 	if err != nil {
 		t.Error(err)
 	}
@@ -149,7 +149,7 @@ func TestByteConverterDouble(t *testing.T) {
 	for _, b := range v {
 		t.Log(b)
 	}
-	value1, err := converter.ToDouble(v, 0)
+	value1, err := converter.ToDoubleE(v, 0)
 	if err != nil {
 		t.Error(err)
 	}
