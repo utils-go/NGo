@@ -19,7 +19,7 @@ type ReconnectUdp struct {
 	//关闭通知
 	closeChan chan struct{}
 	//接收到的字节
-	RecvBuffer *concurrent.ConcurrentListT[byte]
+	RecvBuffer *concurrent.ConcurrentListT[[]byte]
 	//tcp连接
 	conn *net.UDPConn
 	mu   sync.Mutex
@@ -52,7 +52,7 @@ func NewRUdpConnection(serverAddr string) (*ReconnectUdp, error) {
 		DstAddr:       udpAddr,
 		reconnectChan: make(chan struct{}),
 		closeChan:     make(chan struct{}),
-		RecvBuffer:    concurrent.NewListT[byte](),
+		RecvBuffer:    concurrent.NewListT[[]byte](),
 	}
 	go u.handleReconnect()
 	go u.handRead()
@@ -110,7 +110,7 @@ func (u *ReconnectUdp) handRead() {
 		n, addr, err := u.conn.ReadFromUDP(buffer)
 		if err == nil {
 			if addr.String() == u.DstAddr.String() {
-				u.RecvBuffer.AddRange(buffer[:n])
+				u.RecvBuffer.Add(buffer[:n])
 			} else {
 				fmt.Printf("recv from [%s] but listen on [%s]\n", addr.String(), u.DstAddr.String())
 			}
