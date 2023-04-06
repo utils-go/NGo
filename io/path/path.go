@@ -1,6 +1,7 @@
 package path
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -50,4 +51,12 @@ func Equals(path1, path2 string) bool {
 	newPath1 := strings.ReplaceAll(path1, "\\", "/")
 	newPath2 := strings.ReplaceAll(path2, "\\", "/")
 	return newPath1 == newPath2
+}
+func Exists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	} else {
+		return false
+	}
 }

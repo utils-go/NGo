@@ -39,16 +39,23 @@ type DateTime struct {
 func Now() *DateTime {
 	return &DateTime{t: time.Now()}
 }
-func NewDateTime(t time.Time) *DateTime {
+func NewDateTimeFromTime(t time.Time) *DateTime {
 	return &DateTime{t: t}
 }
 
-func (t *DateTime) ToString(cslayout string) string {
-	golayout, err := utils.ConvertLayout(cslayout)
-	if err != nil {
-		golayout = "2006-05-04 15:02:01"
+func NewDateTimeFromString(cslayout, timeStr string) (*DateTime, error) {
+	golayout := utils.ConvertLayout(cslayout)
+	if t, err := time.Parse(golayout, timeStr); err != nil {
+		return nil, err
+	} else {
+		return &DateTime{t: t}, nil
 	}
-	return t.t.Format(golayout)
+}
+
+func (t *DateTime) ToString(cslayout string) (string, error) {
+	golayout := utils.ConvertLayout(cslayout)
+
+	return t.t.Format(golayout), nil
 }
 
 func (t *DateTime) ToTime() *time.Time {

@@ -151,3 +151,16 @@ func WriteAllLines(path string, contents []string) error {
 func WriteAllText(path string, content string) error {
 	return writeFile(path, []byte(content))
 }
+
+func Exists(path string) bool {
+	info, err := os.Stat(path)
+	if err == nil {
+		if !info.IsDir() {
+			return true
+		} else {
+			return false
+		}
+	} else {
+		return false
+	}
+}

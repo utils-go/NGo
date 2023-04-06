@@ -69,9 +69,13 @@ func GetFiles(path string, searchPattern string, recursion bool) ([]string, erro
 	return result, nil
 }
 func Exists(path string) bool {
-	_, err := os.Stat(path)
+	info, err := os.Stat(path)
 	if err == nil {
-		return true
+		if info.IsDir() {
+			return true
+		} else {
+			return false
+		}
 	} else {
 		return false
 	}
