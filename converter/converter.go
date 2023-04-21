@@ -12,7 +12,7 @@ func ConvertToIntFromString(s string) (int, error) {
 func ConvertToStringFromInt(i int) string {
 	return strconv.Itoa(i)
 }
-func ConvertStringToBool(s string) (bool, error) {
+func ConvertToBoolFromString(s string) (bool, error) {
 	if strings.ToLower(s) == "true" {
 		return true, nil
 	}
@@ -28,7 +28,7 @@ func ConvertStringToBool(s string) (bool, error) {
 	return false, fmt.Errorf("%s is a invalid bool string", s)
 }
 
-func ConvertBoolToString(b bool) string {
+func ConvertStringFromBool(b bool) string {
 	if b {
 		return "true"
 	} else {
