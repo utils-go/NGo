@@ -20,11 +20,23 @@ func (c *ConcurrentListT[T]) notifyItemChanged(t changeType) {
 	default:
 	}
 }
+func (c *ConcurrentListT[T]) clearNotifyMsg() {
+	for {
+		select {
+		case _, ok := <-c.chItemChanged:
+			if !ok {
+				return
+			}
+		default:
+			return
+		}
+	}
+}
 
 func NewListT[T any]() *ConcurrentListT[T] {
 	return &ConcurrentListT[T]{
 		data:          make([]T, 0),
-		chItemChanged: make(chan changeType, 1),
+		chItemChanged: make(chan changeType, 100),
 	}
 }
 
@@ -49,6 +61,7 @@ func (c *ConcurrentListT[T]) Clear() {
 	c.data = make([]T, 0)
 	c.mux.Unlock()
 
+	c.clearNotifyMsg()
 	c.notifyItemChanged(remove)
 }
 
@@ -141,20 +154,18 @@ func (c *ConcurrentListT[T]) TakeAll() []T {
 }
 
 // when no item add or no cancel,it will block
-func (c *ConcurrentListT[T]) TakeAllBlock(ctx context.Context) (bool, []T) {
-	chHasAdd := make(chan struct{})
-	go func() {
-		for {
-			if t := <-c.chItemChanged; t == add {
-				chHasAdd <- struct{}{}
+func (c *ConcurrentListT[T]) TakeAllBlock(ctx context.Context) ([]T, bool) {
+	for {
+		select {
+		case t, ok := <-c.chItemChanged:
+			if !ok {
+				return nil, false
 			}
+			if t == add {
+				return c.TakeAll(), true
+			}
+		case <-ctx.Done():
+			return nil, false
 		}
-	}()
-
-	select {
-	case <-ctx.Done():
-		return false, nil
-	case <-chHasAdd:
-		return true, c.TakeAll()
 	}
 }
