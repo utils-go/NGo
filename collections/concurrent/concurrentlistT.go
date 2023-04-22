@@ -1,6 +1,7 @@
 package concurrent
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -139,12 +140,21 @@ func (c *ConcurrentListT[T]) TakeAll() []T {
 	return r
 }
 
-// when no item add,it will block
-func (c *ConcurrentListT[T]) TakeAllBlock() []T {
-	for {
-		if t := <-c.chItemChanged; t == add {
-			break
+// when no item add or no cancel,it will block
+func (c *ConcurrentListT[T]) TakeAllBlock(ctx context.Context) (bool, []T) {
+	chHasAdd := make(chan struct{})
+	go func() {
+		for {
+			if t := <-c.chItemChanged; t == add {
+				chHasAdd <- struct{}{}
+			}
 		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return false, nil
+	case <-chHasAdd:
+		return true, c.TakeAll()
 	}
-	return c.TakeAll()
 }
