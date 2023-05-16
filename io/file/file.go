@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 //refrence:https://learn.microsoft.com/en-us/dotnet/api/system.io?view=netframework-4.7.2
@@ -163,4 +164,9 @@ func Exists(path string) bool {
 	} else {
 		return false
 	}
+}
+
+// modify a file's last modifycation time
+func ChangeModTime(path string, t time.Time) error {
+	return os.Chtimes(path, time.Now(), t)
 }
