@@ -58,7 +58,7 @@ func copyFileWithFlag(srcFile, dstFile string, flag int) error {
 }
 
 func writeFile(path string, contents []byte) error {
-	f, err := os.OpenFile(path, os.O_TRUNC|os.O_CREATE, os.ModePerm)
+	f, err := os.OpenFile(path, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, os.ModePerm)
 	if err != nil {
 		return err
 	}
