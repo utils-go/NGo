@@ -60,8 +60,9 @@ func (t *ReconnectTcp) connect() {
 	if t.conn != nil {
 		t.conn.Close()
 	}
-	con, err := net.Dial("tcp", t.DstAddr)
+	con, err := net.DialTimeout("tcp", t.DstAddr, time.Second*500)
 	if err != nil {
+		t.conn = nil
 		return
 	}
 	t.conn = con
@@ -91,7 +92,7 @@ func (t *ReconnectTcp) reconnect() {
 
 // 连接
 func (t *ReconnectTcp) handleRead() {
-	buf := make([]byte, 1024*10)
+	buf := make([]byte, 1024)
 	for {
 		//处理关闭
 		select {

@@ -93,7 +93,7 @@ func (t *ReconnectUdp) reconnect() {
 
 // 处理读取数据
 func (u *ReconnectUdp) handRead() {
-	buffer := make([]byte, 1024*10)
+	buffer := make([]byte, 1024)
 	for {
 		select {
 		case <-u.closeChan:
